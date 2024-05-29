@@ -1,4 +1,6 @@
 from htmlnode import LeafNode, ParentNode
+from textnode import TextNode, text_nodes_to_html_nodes
+from inline_markdown import text_to_textnodes
 
 block_type_paragraph = "paragraph"
 block_type_heading = "heading"
@@ -32,28 +34,44 @@ def block_to_block_type(md_block):
 
 
 def block_to_html_paragraph(p_block):
-    return ParentNode([LeafNode(l) for l in p_block.split('\n')], "p")
+    return ParentNode(
+        text_nodes_to_html_nodes(text_to_textnodes(p_block)),
+        'p',
+    )
+
+
+convert = lambda arg: text_nodes_to_html_nodes(text_to_textnodes(arg))
 
 
 def block_to_html_heading(h_block):
-    weight = len(h_block.split()[0])
-    return ParentNode([LeafNode(h_block.lstrip("#")[1:])], f"h{weight}")
+    text = h_block.lstrip("#")[1:]
+    return ParentNode(
+        convert(text),
+        f"h{len(h_block.split()[0])}",
+    )
+
 
 
 def block_to_html_code(c_block):
-    return ParentNode([LeafNode(c_block[3:-3], "pre")], "code")
+    return ParentNode([LeafNode(c_block[3:-3], "code")], "pre")
 
 
 def block_to_html_quote(q_block):
-    return ParentNode([LeafNode(l[1:]) for l in q_block.split('\n')], "quoteblock")
+    new_block = '\n'.join([line[2:] for line in q_block.split('\n')])
+    return ParentNode(
+        convert(new_block),
+        "quoteblock"
+    )
 
 
 def block_to_html_unordered_list(ul_block):
-    return ParentNode([LeafNode(l[2:], "li") for l in ul_block.split('\n')], "ul")
+    lines = ul_block.split('\n')
+    return ParentNode([ParentNode(convert(l[2:]), "li") for l in lines], "ul")
 
 
 def block_to_html_ordered_list(ol_block):
-    return ParentNode([LeafNode(l[3:], "li") for l in ol_block.split('\n')], "ol")
+    lines = ol_block.split('\n')
+    return ParentNode([ParentNode(convert(l[3:]), "li") for l in lines], "ol")
 
 
 def markdown_to_html_node(markdown):

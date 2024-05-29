@@ -43,5 +43,5 @@ class ParentNode(HTMLnode):
         super().__init__(tag=tag, children=children, props=props)
 
     def to_html(self):
-        return "<div>" + "".join(map(lambda c: c.to_html(), self.children)) + "</div>"
+        return f"<{self.tag}>" + "".join(map(lambda c: c.to_html(), self.children)) + f"</{self.tag}>"
 

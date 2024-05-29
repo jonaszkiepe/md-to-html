@@ -26,15 +26,18 @@ class TextNode:
         return f"TextNode({self.text}, {self.text_type}, {self.url})"
 
 
-def text_node_to_html_node(n) -> LeafNode:
-    tag, props, value = None, None, n.text
-    if n.text_type == text_type_text: pass
-    elif n.text_type == text_type_bold: tag = "b"
-    elif n.text_type == text_type_italic: tag = "i"
-    elif n.text_type == text_type_code: tag = "code"
-    elif n.text_type == text_type_link: tag, props = "a", {"href": n.url}
-    elif n.text_type == text_type_image:
-        value, tag, props = "", "img", {"src": n.url, "alt": n.text}
-    else: raise TypeError("Incorrect text type")
-    return LeafNode(value=value, tag=tag, props=props)
+def text_nodes_to_html_nodes(nodes):
+    leaf_nodes = []
+    for n in nodes:
+        tag, props, value = None, None, n.text
+        if n.text_type == text_type_text: pass
+        elif n.text_type == text_type_bold: tag = "b"
+        elif n.text_type == text_type_italic: tag = "i"
+        elif n.text_type == text_type_code: tag = "code"
+        elif n.text_type == text_type_link: tag, props = "a", {"href": n.url}
+        elif n.text_type == text_type_image:
+            value, tag, props = "", "img", {"src": n.url, "alt": n.text}
+        else: raise TypeError("Incorrect text type")
+        leaf_nodes.append(LeafNode(value=value, tag=tag, props=props))
+    return leaf_nodes
 
